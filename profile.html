@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - iBlog</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+            text-align: center;
+        }
+
+        .profile-pic {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 4px solid #ff7a00;
+        }
+
+        h2 {
+            font-size: 24px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .profile-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .profile-info label {
+            font-size: 16px;
+            color: #555;
+        }
+
+        .edit-button {
+            background-color: #ff7a00;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s;
+        }
+
+        .edit-button:hover {
+            background-color: #ff5800;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            display: none;
+        }
+
+        #saveChangesBtn {
+            background-color: #ff7a00;
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            display: none;
+        }
+
+        #saveChangesBtn:hover {
+            background-color: #ff5800;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>Your Profile</h2>
+
+        <!-- Profile Picture -->
+        <img id="profilePicPreview" class="profile-pic" alt="Profile Picture" src="default-avatar.png">
+
+        <!-- Display Name with Edit Button -->
+        <div class="profile-info">
+            <label id="displayName">Name: Shabea</label>
+            <button class="edit-button" id="editNameBtn">Edit</button>
+        </div>
+
+        <!-- Display Email with Edit Button -->
+        <div class="profile-info">
+            <label id="displayEmail">Email: example@example.com</label>
+            <button class="edit-button" id="editEmailBtn">Edit</button>
+        </div>
+
+        <!-- Password Edit Section -->
+        <div class="profile-info">
+            <label>Password: ********</label>
+            <button class="edit-button" id="editPasswordBtn">Change</button>
+        </div>
+
+        <!-- Editable Input Fields -->
+        <form id="editForm">
+            <input type="text" id="editNameInput" placeholder="Enter new name">
+            <input type="email" id="editEmailInput" placeholder="Enter new email">
+            <input type="password" id="newPasswordInput" placeholder="Enter new password">
+            <input type="password" id="currentPasswordInput" placeholder="Enter current password">
+            <button type="submit" id="saveChangesBtn">Save Changes</button>
+        </form>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js";
+        import { getAuth, updateEmail, sendEmailVerification, updatePassword, reauthenticateWithCredential, EmailAuthProvider, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-auth.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfwlOG-GY6TBrC6qizPEbUS43W2LCza0A",
+            authDomain: "iblog-39e10.firebaseapp.com",
+            projectId: "iblog-39e10",
+            storageBucket: "iblog-39e10.appspot.com",
+            messagingSenderId: "464945734791",
+            appId: "1:464945734791:web:cc4069578aa32f23b78422"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+        const db = getFirestore();
+
+        async function loadUserProfile() {
+            const user = auth.currentUser;
+            console.log(auth)
+           
+
+            onAuthStateChanged(auth, (user) => {
+                console.log(user)
+                if (user) {
+                     document.getElementById('displayEmail').innerText = `Email: ${user.email}`;
+                    document.getElementById("displayName").innerHTML = `Name: ${user.displayName}`;
+                    document.getElementById('profilePicPreview').src = user.profilePicURL || 'default-avatar.png';
+                    const uid = user.uid;
+                } else {
+                }
+            })
+            
+            
+        }
+        loadUserProfile();
+
+        document.getElementById('editNameBtn').addEventListener('click', () => {
+            document.getElementById('editNameInput').style.display = 'block';
+            document.getElementById('saveChangesBtn').style.display = 'block';
+        });
+
+        document.getElementById('editEmailBtn').addEventListener('click', () => {
+            document.getElementById('editEmailInput').style.display = 'block';
+            document.getElementById('saveChangesBtn').style.display = 'block';
+        });
+
+        document.getElementById('editPasswordBtn').addEventListener('click', () => {
+            document.getElementById('newPasswordInput').style.display = 'block';
+            document.getElementById('currentPasswordInput').style.display = 'block';
+            document.getElementById('saveChangesBtn').style.display = 'block';
+        });
+
+        document.getElementById('editForm').addEventListener('submit', async (event) => {
+            event.preventDefault();
+            const newName = document.getElementById('editNameInput').value;
+            const newEmail = document.getElementById('editEmailInput').value;
+            const newPassword = document.getElementById('newPasswordInput').value;
+            const currentPassword = document.getElementById('currentPasswordInput').value;
+            const user = auth.currentUser;
+
+            if (newName) {
+                await setDoc(doc(db, 'users', user.uid), { name: newName }, { merge: true });
+                document.getElementById("displayName").innerText = `Name: ${newName}`;
+            }
+
+            if (newEmail && newEmail !== user.email) {
+                try {
+                    await updateEmail(user, newEmail);
+                    document.getElementById("displayEmail").innerText = `Email: ${newEmail}`;
+                } catch (error) {
+                    alert('Error updating email: ' + error.message);
+                }
+            }
+
+            sendEmailVerification(user);
+
+
+            if (newPassword && currentPassword) {
+                const credential = EmailAuthProvider.credential(user.email, currentPassword);
+                try {
+                    await reauthenticateWithCredential(user, credential);
+                    await updatePassword(user, newPassword);
+                    alert('Password updated successfully!');
+                } catch (error) {
+                    alert('Error changing password: ' + error.message);
+                }
+            }
+
+            alert('Profile updated successfully!');
+            loadUserProfile();
+        });
+    </script>
+
+</body>
+
+</html>

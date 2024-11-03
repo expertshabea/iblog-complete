@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Post Preview</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+        body {
+            font-family: 'Poppins', Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #683a42, #ffc3a0);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .output-container {
+            background-color: white;
+            padding: 40px;
+            max-width: 600px;
+            margin: auto;
+            box-shadow: 0px 15px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            text-align: center;
+            transition: transform 0.4s ease, box-shadow 0.4s ease;
+        }
+
+        .output-container:hover {
+            transform: translateY(-10px);
+            box-shadow: 0px 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        h2 {
+            font-size: 2.5em;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            animation: fadeInDown 1s ease;
+        }
+
+        .output-container img {
+            max-width: 100%;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.15);
+            animation: fadeIn 1.2s ease;
+        }
+
+        .output-container p {
+            text-align: left;
+            font-size: 1.2em;
+            margin: 20px 0;
+            color: #7f8c8d;
+            line-height: 1.6;
+            font-weight: 300;
+            animation: fadeInUp 1s ease;
+        }
+
+        .output-container strong {
+            font-weight: 600;
+            color: #34495e;
+        }
+
+        p span {
+            color: #2c3e50;
+        }
+
+        @keyframes fadeInDown {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+            to {
+                opacity: 1;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+    <div class="output-container">
+        <h2>Blog Post Preview</h2>
+        <img id="imageShow" alt="Uploaded Image Preview">
+        <p><strong>Heading:</strong> <span id="output-heading"></span></p>
+        <p><strong>Paragraph:</strong> <span id="output-paragraph"></span></p>
+        <p><strong>Author Name:</strong> <span id="output-author-name"></span></p>
+        <p><strong>Author Email:</strong> <span id="output-author-email"></span></p>
+    </div>
+
+    <script>
+        // Get the stored blog data from localStorage
+        const blogData = JSON.parse(localStorage.getItem("blogData"));
+
+        if (blogData) {
+            // Display the blog details
+            document.getElementById("imageShow").src = blogData.image;
+            document.getElementById("output-heading").textContent = blogData.heading;
+            document.getElementById("output-paragraph").textContent = blogData.paragraph;
+            document.getElementById("output-author-name").textContent = blogData.authorName;
+            document.getElementById("output-author-email").textContent = blogData.authorEmail;
+        } else {
+            alert("No blog data found!");
+        }
+    </script>
+</body>
+
+</html>

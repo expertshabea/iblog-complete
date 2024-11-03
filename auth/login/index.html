@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign In</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+        }
+
+        .signin {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #fff;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h2 {
+            text-align: center;
+        }
+
+        input[type="email"],
+        input[type="password"] {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #ff7a00;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        button:hover {
+            background-color: #ff5800;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="signin">
+        <h2>Sign In</h2>
+        <form id="signin_container">
+            <input type="email" id="signin_email" placeholder="Email" required>
+            <input type="password" id="signin_password" placeholder="Password" required>
+            <button type="button" id="signin_button">Sign In</button>
+        </form>
+    </div>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js"
+        import { getAuth, signInWithEmailAndPassword, sendEmailVerification, signOut } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js"
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfwlOG-GY6TBrC6qizPEbUS43W2LCza0A",
+            authDomain: "iblog-39e10.firebaseapp.com",
+            projectId: "iblog-39e10",
+            storageBucket: "iblog-39e10.appspot.com",
+            messagingSenderId: "464945734791",
+            appId: "1:464945734791:web:cc4069578aa32f23b78422"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+
+        document.getElementById('signin_button').addEventListener('click', function () {
+            const email = document.getElementById('signin_email').value;
+            const password = document.getElementById('signin_password').value;
+
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    if (user.emailVerified) {
+                        localStorage.setItem('userEmail', user.email);
+                        localStorage.setItem('userProfileImage', user.photoURL || 'img/default-profile.png');
+
+                        alert('Signed in successfully! Redirecting to home page.');
+                        window.location.href = '../../index.html';  // Redirect to home page
+                    } else {
+                        sendVerificationEmail(user);
+                        signOut(auth);  // Sign out if email is not verified
+                    }
+                })
+                .catch((error) => {
+                    alert("Error: " + error.message);
+                });
+        });
+
+        function sendVerificationEmail(user) {
+            sendEmailVerification(auth.currentUser)
+                .then(() => {
+                    alert('Verification email sent. Please check your inbox.');
+                })
+                .catch((error) => {
+                    alert('Error sending verification email: ' + error.message);
+                });
+        }
+    </script>
+</body>
+
+</html>

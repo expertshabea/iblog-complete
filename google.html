@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup with Google💻</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .signup {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #b17171;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #000000;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #000000;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #ff7a00;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #ff5800;
+        }
+
+        .navigation {
+            margin-top: 25px;
+            font-family: var(--font1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-left {
+            display: flex;
+        }
+
+        .nav-left span {
+            font-size: 35px;
+            padding-top: 10px;
+        }
+
+        .nav-left ul {
+            display: flex;
+            align-items: center;
+            margin: 0 77px;
+            font-size: 22px;
+            padding-bottom: 23px;
+        }
+
+        .nav-left ul li {
+            list-style: none;
+            margin: 0 14px;
+            font-family: var(--font2);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .nav-left ul li a {
+            text-decoration: none;
+            color: black;
+        }
+
+        .nav-left ul li a:hover {
+            color: var(--main-bg-color);
+            font-weight: bolder;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="signup">
+        <h2>Sign Up with Google💻</h2>
+        <form id="signup_container" onsubmit="return false;">
+            <input type="text" id="name" placeholder="Name" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <input type="password" id="recheck_password" placeholder="Re-enter Password" required>
+            <button id="google-signin">Sign in with Google</button><br>
+            <div class="links">
+                🎇sign up with <a href="signup.html"> email</a><br>
+                🎇sign up with <a href="facebook.html"> facebook</a><br>
+                🎇sign up with <a href="github.html"> github</a>
+            </div>
+        </form>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        // Import the Firebase services
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js';
+        import { getAuth, GoogleAuthProvider, signInWithPopup } from 'https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js';
+
+       
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfwlOG-GY6TBrC6qizPEbUS43W2LCza0A",
+            authDomain: "iblog-39e10.firebaseapp.com",
+            projectId: "iblog-39e10",
+            storageBucket: "iblog-39e10.appspot.com",
+            messagingSenderId: "464945734791",
+            appId: "1:464945734791:web:cc4069578aa32f23b78422"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const googleButton = document.getElementById('google-signin');
+            googleButton.addEventListener('click', () => {
+                const provider = new GoogleAuthProvider();
+                signInWithPopup(auth, provider)
+                    .then((result) => {
+                        const user = result.user;
+                        console.log("User signed in:", user);
+                        alert(`Welcome, ${user.displayName}!`);
+                        // You can also save the user details to your database here if needed
+                    })
+                    .catch((error) => {
+                        console.error("Error signing in:", error);
+                        alert(`Error signing in: ${error.message}`);
+                    });
+            });
+        });
+    </script>
+
+</body>
+
+</html>

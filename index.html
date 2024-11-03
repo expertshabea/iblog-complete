@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/utils.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/mobile.css">
+    <title>iBlog - Heaven for bloggers</title>
+    <style>
+        .icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid #ff7a00;
+        }
+
+        .nav-right {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+        }
+
+        #user_name {
+            text-align: center;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+
+        .account-icon {
+            cursor: pointer;
+            display: inline-block;
+            position: relative;
+            
+        }
+
+        .account-icon:hover .dropdown {
+            display: block;
+        }
+
+        .dropdown {
+            display: none;
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background-color: white;
+            color: black;
+            border: 1px solid #ccc;
+            width: 200px;
+            z-index: 1;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .dropdown a {
+            display: block;
+            padding: 10px;
+            text-decoration: none;
+            color: black;
+        }
+
+        .dropdown a:hover {
+            background-color: #f4f4f4;
+        }
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        .blog-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+
+        .blog {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        .blog img {
+            width: 100%;
+            height: 200px;
+            object-fit: cover;
+            border-radius: 10px;
+        }
+
+        .blog h2 {
+            font-size: 20px;
+            margin: 10px 0;
+        }
+
+        .blog p {
+            color: #555;
+        }
+        #profileIcon{
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            object-fit: cover;
+            cursor: pointer;
+            border: 2px solid #ff7a00;
+        }
+        #displayUserName{
+            text-align: center;
+            margin-top: 5px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <nav class="navigation max-width-1 m-auto">
+        <div class="nav-left">
+            <a href="/">
+                <span><img src="img/logo.png" width="94px" alt=""></span>
+            </a>
+            <ul id="nav_links">
+                <li><a href="about.html">About</a></li>
+                <li><a href="contact.html">Contact</a></li>
+                <li><a href="./auth/login/index.html">Signin</a></li>
+                <li><a href="./auth/register/index.html">Signup</a></li>
+            </ul>
+        </div>
+        <div class="nav-right">
+            <form action="search.html" method="get">
+                <input class="form-input" type="text" name="query" placeholder="Article Search">
+                <button class="btn">Search</button>
+            </form>
+            <div class="account-icon" id="profile_section">
+                <div class="profile-icon">
+                    <img id="profileIcon" src="default-avatar.png" alt="Profile Icon" height="40px">
+                    <span id="displayUserName">User</span>
+                </div>
+                <div class="dropdown" id="myBlogsDropdown">
+                    <a href="dashboard.html">Dashboard</a>
+                    <a href="blogmaking.html">Create Blog</a>
+                    <a href="profile.html">Profile</a>
+                    <a id="logout-btn" href="#">Logout</a>
+                </div>
+            </div>
+        </div>
+
+    </nav>
+
+    <div class="max-width-1 m-auto">
+        <hr>
+    </div>
+
+    <div class="m-auto content max-width-1 my-2">
+        <div class="content-left">
+            <h1>The heaven for bloggers</h1>
+            <p>iBlog is a website which lets you submit an article which upon approval will be up on our website and you
+                can get a good amount of reach from here!</p>
+            <p>My Halloween decorations are staying in the box this year. To be honest, they didn’t make it out of the
+                box last year either...</p>
+        </div>
+        <div class="content-right">
+            <img src="img/home.svg" alt="iBlog">
+        </div>
+    </div>
+
+    <div class="max-width-1 m-auto">
+        <hr>
+    </div>
+
+
+    <div class="blog-container" id="blog-container">
+        <!-- Blogs will be loaded here -->
+    </div>
+
+    <div class="footer">
+        <p>Copyright &copy; shabea fatima</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-app.js"
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/9.14.0/firebase-auth.js"
+         import { getFirestore, collection, getDocs, doc, getDoc} from "https://www.gstatic.com/firebasejs/9.14.0/firebase-firestore.js"
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfwlOG-GY6TBrC6qizPEbUS43W2LCza0A",
+            authDomain: "iblog-39e10.firebaseapp.com",
+            projectId: "iblog-39e10",
+            storageBucket: "iblog-39e10.appspot.com",
+            messagingSenderId: "464945734791",
+            appId: "1:464945734791:web:cc4069578aa32f23b78422"
+        };
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth();
+const db = getFirestore(app)
+        // Check authentication state and update the UI
+        onAuthStateChanged(auth, (user) => {
+            const profileSection = document.getElementById('profile_section');
+            const userName = document.getElementById('username');
+            const navLinks = document.getElementById('nav_links');
+
+            if (user) {
+                profileSection.style.display = 'block';
+                userName.innerHTML = `default-avatar.png; ${user.displayName ? user.displayName : user.email} `
+                navLinks.innerHTML = `
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                `;
+            } else {
+                profileSection.style.display = 'none';
+                navLinks.innerHTML = `
+                    <li><a href="about.html">About</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li><a href="./auth/login/index.html">Signin</a></li>
+                    <li><a href="./auth/register/index.html">Signup</a></li>
+                `;
+            }
+        });
+
+        let logout = document.getElementById("logout-btn")
+
+        logout.addEventListener("click", () => {
+            signOut(auth).then((res) => {
+                window.location.reload()
+            }).catch((err) => {
+                console.log(err);
+            })
+        })   
+        async function loadBlogs() {
+            const blogContainer = document.getElementById('blog-container');
+
+            try {
+                // Fetch all blogs from Firestore
+                const querySnapshot = await getDocs(collection(db, "blogs"));
+
+                querySnapshot.forEach((doc) => {
+                    const blog = doc.data();
+                    // Create blog elements
+                    const blogElement = document.createElement('div');
+                    blogElement.classList.add('blog');
+                    blogElement.innerHTML = `
+                        <img src="${blog.image}" alt="${blog.heading}">
+                        <h2>${blog.heading}</h2>
+                        <p>${blog.paragraph}</p>
+                        <p>Author: ${blog.authorName}</p>
+                    `;
+                    blogContainer.appendChild(blogElement);
+                });
+
+                if (querySnapshot.empty) {
+                    blogContainer.innerHTML = "<p>No blogs available</p>";
+                }
+            } catch (error) {
+                console.error("Error loading blogs: ", error);
+            }
+        }
+        window.onload = loadBlogs ; 
+        onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        const docSnap = await getDoc(doc(db, 'users', user.uid));
+        if (docSnap.exists()) {
+            const data = docSnap.data();
+            document.getElementById('displayUserName').innerText = data.name || "User";
+            document.getElementById('profileIcon').src = data.profilePicURL || 'default-avatar.png';
+        }
+    }
+});
+    </script>
+</body>
+
+</html>

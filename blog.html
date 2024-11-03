@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog</title>
+    <style>
+        input[type="text"],
+        input[type="file"] {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="text" id="name" placeholder="name">
+    <input type="text" id="date" placeholder="enter date">
+    <input type="text" id="blog" placeholder="your blog">
+    <input type="file" id="picture" placeholder="place your image">
+    <button onclick="createBlog()">Submit your blog</button>
+    <script>
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-app.js";
+        import { getFirestore, collection, addDoc } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore.js";
+        import { getStorage, ref, uploadBytesResumable, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.14.0/firebase-storage.js"
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfwlOG-GY6TBrC6qizPEbUS43W2LCza0A",
+            authDomain: "iblog-39e10.firebaseapp.com",
+            projectId: "iblog-39e10",
+            storageBucket: "iblog-39e10.appspot.com",
+            messagingSenderId: "464945734791",
+            appId: "1:464945734791:web:cc4069578aa32f23b78422"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const storage = getStorage();
+        let form = document.querySelector(".form-container")
+
+        form.addEventListener("submit", async (e) => {
+            e.preventDefault()
+            let heading = document.getElementById("heading").value
+            let paragraph = document.getElementById("paragraph").value
+            let author_name = document.getElementById("author-name").value
+            let author_email = document.getElementById("author-email").value
+
+            try {
+
+
+                const metadata = {
+                    contentType: 'image/jpeg'
+                };
+
+                let file = document.getElementById("image").files[0]
+                const storageRef = ref(storage, 'images/' + file.name);
+                const uploadTask = uploadBytesResumable(storageRef, file, metadata);
+
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        console.log('Upload is ' + progress + '% done');
+                        switch (snapshot.state) {
+                            case 'paused':
+                                console.log('Upload is paused');
+                                break;
+                            case 'running':
+                                console.log('Upload is running');
+                                break;
+                        }
+                    },
+                    (error) => {
+                        switch (error.code) {
+                            case 'storage/unauthorized':
+                                break;
+                            case 'storage/canceled':
+                                break;
+
+                            case 'storage/unknown':
+                                break;
+                        }
+                    },
+                    () => {
+                        getDownloadURL(uploadTask.snapshot.ref).then(async (downloadURL) => {
+                            await addDoc(collection(db, "blogs"), {
+                                heading,
+                                paragraph,
+                                author_name,
+                                author_email,
+                                image: downloadURL
+                            });
+                        });
+                    }
+                );
+                alert("Blog Published Successfully!")
+            } catch (e) {
+                console.error("Error adding document: ", e);
+            }
+        })
+    </script>
+</body>
+
+</html>

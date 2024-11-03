@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Signup with Facebook</title>
+    <style>
+         body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+
+        .signup {
+            max-width: 400px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #4f4dbb;
+            box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 10px;
+        }
+
+        h2 {
+            text-align: center;
+            color: #ffffff;
+            margin-bottom: 20px;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        input[type="password"] {
+            margin-bottom: 15px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #ff7a00;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #ff5800;
+        }
+
+        .navigation {
+            margin-top: 25px;
+            font-family: var(--font1);
+            /* height: 74px;  */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .nav-left {
+            display: flex;
+        }
+
+        .nav-left span {
+            font-size: 35px;
+            padding-top: 10px;
+        }
+
+        .nav-left ul {
+            display: flex;
+            align-items: center;
+            margin: 0 77px;
+            font-size: 22px;
+            padding-bottom: 23px;
+        }
+
+        .nav-left ul li {
+            list-style: none;
+            margin: 0 14px;
+            font-family: var(--font2);
+            transition: all 0.3s ease-in-out;
+        }
+
+        .nav-left ul li a {
+            text-decoration: none;
+            color: black;
+        }
+
+        .nav-left ul li a:hover {
+            color: var(--main-bg-color);
+            font-weight: bolder;
+        }
+    </style>
+    <!-- Firebase App (the core Firebase SDK) -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <!-- Firebase Authentication -->
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+</head>
+<body>
+    <nav class="navigation max-width-1 m-auto"></nav>
+    <div class="signup">
+        <h2>Sign Up with Facebook</h2>
+        <form id="signup_container">
+            <input type="text" id="name" placeholder="Name" required>
+            <input type="email" id="email" placeholder="Email" required>
+            <input type="password" id="password" placeholder="Password" required>
+            <input type="password" id="recheck_password" placeholder="Re-enter Password" required>
+            <button id="submit">Submit</button>
+        </form>
+    </div> 
+    <script>
+        // Your Firebase initialization and Facebook login logic here
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfwlOG-GY6TBrC6qizPEbUS43W2LCza0A",
+            authDomain: "iblog-39e10.firebaseapp.com",
+            projectId: "iblog-39e10",
+            storageBucket: "iblog-39e10.appspot.com",
+            messagingSenderId: "464945734791",
+            appId: "1:464945734791:web:cc4069578aa32f23b78422"
+        };
+        
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        
+        // Initialize Firebase Authentication
+        const auth = firebase.auth();
+        
+        document.getElementById('submit').addEventListener('click', function (e) {
+    e.preventDefault();  // Prevent the form from submitting
+
+    const provider = new firebase.auth.FacebookAuthProvider();
+
+    // Sign in with Facebook popup
+    auth.signInWithPopup(provider)
+        .then((result) => {
+            const user = result.user;
+            alert('Signed in successfully as: ' + user.displayName);
+        })
+        .catch((error) => {
+            if (error.code === 'auth/popup-closed-by-user') {
+                alert('The popup was closed before sign-in could be completed. Please try again.');
+            } else {
+                console.error('Error during sign-in: ', error.message);
+            }
+        });
+});
+
+    </script>
+</body>
+</html>
